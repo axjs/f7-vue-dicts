@@ -33,56 +33,58 @@ import App from './app'
 Vue.use(Framework7Vue)
 
 //Init Firebase
-  var config = {
+var config = {
     apiKey: "AIzaSyDc_LHRrNRto4BV23Do8NHsqNdAt26Fz10",
     authDomain: "data-ab752.firebaseapp.com",
     databaseURL: "https://data-ab752.firebaseio.com",
     storageBucket: "data-ab752.appspot.com",
     messagingSenderId: "141730081452"
-  };
+};
 
 firebase.initializeApp(config);
 var usersRef = firebase.database().ref('users')
 
 // Init App
 window.app = new Vue({
-  el: '#app',
-  template: '<app/>',
-  // Init Framework7 by passing parameters here
-  framework7: {
-    root: '#app',
-    /* Uncomment to enable Material theme: */
-    // material: true,
-    pushState: true,
-    routes: Routes,
-  },
-  firebase: {
-    users: usersRef
-  },
-  methods: {
-    addItem: function () {
-      usersRef.push({name: Date.now()})
+    el: '#app',
+    template: '<app/>',
+    // Init Framework7 by passing parameters here
+    framework7: {
+        root: '#app',
+        /* Uncomment to enable Material theme: */
+        // material: true,
+        pushState: true,
+        routes: Routes,
     },
-    removeItem: function (item) {
-      usersRef.child(item['.key']).remove()
-    }
-  },
-  data: function () {
-      return {
-        user: {
-          name: 'Vladimir!',
-          lastName: 'Kharlampidi',
-          age: 30
+    firebase: {
+        users: usersRef
+    },
+    methods: {
+        addItem: function() {
+            usersRef.push({
+                name: Date.now()
+            })
         },
-        popupOpened: false,
-        loginScreenOpened: false,
-        pickerOpened: false,
-        actionsOpened: false
-      };
+        removeItem: function(item) {
+            usersRef.child(item['.key']).remove()
+        }
+    },
+    data: function() {
+        return {
+            user: {
+                name: 'Vladimir!',
+                lastName: 'Kharlampidi',
+                age: 30
+            },
+            popupOpened: false,
+            loginScreenOpened: false,
+            pickerOpened: false,
+            actionsOpened: false
+        };
     },
 
-  // Register App Component
-  components: {
-    app: App
-  }
+    // Register App Component
+    components: {
+        app: App
+    }
 });
