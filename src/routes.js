@@ -10,5 +10,17 @@ export default [
   {
       path: '/dynamic-route/blog/:blogId/post/:postId/',
       component: require('./pages/dynamic-route.vue')
+  },
+  {
+    path: '/data-binding/',
+    component: require('./pages/data-binding.vue')
+  },
+  {
+    path: '/lists/',
+    component: require('./pages/lists.vue')
+  },
+  {
+    path: '/data-binding-edit/',
+    component: require('./pages/data-binding-edit.vue')
   }
 ]
