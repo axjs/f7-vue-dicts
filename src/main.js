@@ -59,6 +59,14 @@ window.app = new Vue({
   firebase: {
     users: usersRef
   },
+  methods: {
+    addItem: function () {
+      usersRef.push({name: Date.now()})
+    },
+    removeItem: function (item) {
+      usersRef.child(item['.key']).remove()
+    }
+  },
   data: function () {
       return {
         user: {
