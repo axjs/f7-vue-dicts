@@ -34,57 +34,76 @@ Vue.use(Framework7Vue)
 
 //Init Firebase
 var config = {
-    apiKey: "AIzaSyDc_LHRrNRto4BV23Do8NHsqNdAt26Fz10",
-    authDomain: "data-ab752.firebaseapp.com",
-    databaseURL: "https://data-ab752.firebaseio.com",
-    storageBucket: "data-ab752.appspot.com",
-    messagingSenderId: "141730081452"
+  apiKey: "AIzaSyDc_LHRrNRto4BV23Do8NHsqNdAt26Fz10",
+  authDomain: "data-ab752.firebaseapp.com",
+  databaseURL: "https://data-ab752.firebaseio.com",
+  storageBucket: "data-ab752.appspot.com",
+  messagingSenderId: "141730081452"
 };
 
 firebase.initializeApp(config);
-var usersRef = firebase.database().ref('users')
 
 // Init App
 window.app = new Vue({
-    el: '#app',
-    template: '<app/>',
-    // Init Framework7 by passing parameters here
-    framework7: {
-        root: '#app',
-        /* Uncomment to enable Material theme: */
-        // material: true,
-        pushState: true,
-        routes: Routes,
+  el: '#app',
+  template: '<app/>',
+  // Init Framework7 by passing parameters here
+  framework7: {
+    root: '#app',
+    /* Uncomment to enable Material theme: */
+    // material: true,
+    pushState: true,
+    routes: Routes,
+  },
+  // firebase: {
+  //     users: firebase.database().ref('users')
+  // },
+  methods: {
+    addItem: function() {
+      this.$firebaseRefs.items.push({
+        name: Date.now()
+      })
     },
-    firebase: {
-        users: usersRef
+    removeItem: function(item) {
+      this.$firebaseRefs.items.child(item['.key']).remove()
     },
-    methods: {
-        addItem: function() {
-            usersRef.push({
-                name: Date.now()
-            })
-        },
-        removeItem: function(item) {
-            usersRef.child(item['.key']).remove()
-        }
-    },
-    data: function() {
-        return {
-            user: {
-                name: 'Vladimir!',
-                lastName: 'Kharlampidi',
-                age: 30
-            },
-            popupOpened: false,
-            loginScreenOpened: false,
-            pickerOpened: false,
-            actionsOpened: false
-        };
-    },
-
-    // Register App Component
-    components: {
-        app: App
+    setCurrent: function(key) {
+      this.$bindAsObject('item', this.$firebaseRefs.items.child(key))
     }
+  },
+  watch: {
+    dict: function(value, oldValue) {
+      console.log('DICT changed', value, oldValue)
+      this.$bindAsArray('items', firebase.database().ref(value))
+    },
+    item: {
+      handler: function(value, oldValue) {
+        var res = JSON.parse(JSON.stringify(value))
+        delete res['.key']
+        console.log('item changed', value, oldValue, value['.key'], Object.keys(value))
+        if (value['.key']) {
+          this.$firebaseRefs.items.child(value['.key']).set(res)
+        }
+      },
+      deep: true
+    }
+  },
+  // beforeMount : function (value, oldValue) {
+  //   // this.dict = 'users'
+  // },
+  data: function() {
+    return {
+      dict: '',
+      item: {},
+      popupOpened: false,
+      loginScreenOpened: false,
+      pickerOpened: false,
+      actionsOpened: false
+    };
+  },
+
+  // Register App Component
+  components: {
+    app: App
+  }
 });
