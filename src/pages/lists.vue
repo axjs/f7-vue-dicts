@@ -24,11 +24,14 @@ export default {
   //         items: this.$root.items
   //     }
   // },
+
   computed: {
     items: function() {
-      return this.$root.items
+      console.log('items', this.$root.items)
+      return this.$root.items || []
     }
   },
+
   methods: {
     addItem: function() {
       this.$root.addItem()
@@ -37,7 +40,9 @@ export default {
       this.$root.removeItem(item)
     }
   },
-  mounted: function() {
+
+  beforeMount: function() {
+    console.log('mounted', this.$route.params.name)
     this.$root.dict = this.$route.params.name
   }
 }

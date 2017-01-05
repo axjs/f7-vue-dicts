@@ -69,24 +69,35 @@ window.app = new Vue({
     },
     setCurrent: function(key) {
       this.$bindAsObject('item', this.$firebaseRefs.items.child(key))
-    }
-  },
-  watch: {
-    dict: function(value, oldValue) {
-      console.log('DICT changed', value, oldValue)
-      this.$bindAsArray('items', firebase.database().ref(value))
-    },
-    item: {
-      handler: function(value, oldValue) {
+
+      this.$itemWatched || this.$watch('item', function(value, oldValue) {
         var res = JSON.parse(JSON.stringify(value))
         delete res['.key']
         console.log('item changed', value, oldValue, value['.key'], Object.keys(value))
         if (value['.key']) {
           this.$firebaseRefs.items.child(value['.key']).set(res)
         }
-      },
-      deep: true
+      }, {deep: true})
+      this.$itemWatched = true
     }
+  },
+  watch: {
+    dict: function(value, oldValue) {
+      console.log('DICT changed', value, oldValue)
+      this.$bindAsArray('items', firebase.database().ref(value))
+      // this.items = this.items
+    },
+    // item: {
+    //   handler: function(value, oldValue) {
+    //     var res = JSON.parse(JSON.stringify(value))
+    //     delete res['.key']
+    //     console.log('item changed', value, oldValue, value['.key'], Object.keys(value))
+    //     if (value['.key']) {
+    //       this.$firebaseRefs.items.child(value['.key']).set(res)
+    //     }
+    //   },
+    //   deep: true
+    // }
   },
   // beforeMount : function (value, oldValue) {
   //   // this.dict = 'users'
@@ -94,7 +105,8 @@ window.app = new Vue({
   data: function() {
     return {
       dict: '',
-      item: {},
+      // item: {},
+      // items: [],
       popupOpened: false,
       loginScreenOpened: false,
       pickerOpened: false,
