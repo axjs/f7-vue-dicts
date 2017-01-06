@@ -21,7 +21,8 @@ export default {
         {
           label: 'Last Name',
           type: 'text',
-          key: 'lastName'
+          key: 'lastName',
+          default : 'Last Name'
         },
         {
           label: 'Age',
@@ -37,6 +38,7 @@ export default {
           label: 'Select',
           type: 'select',
           key: 'select',
+          default : '3',
           options: [
             { value: 1, text : 'USD'},
             { value: 2, text : 'EUR'},
@@ -46,7 +48,8 @@ export default {
         {
           label: 'Color',
           type: 'color',
-          key: 'color'
+          key: 'color',
+          default : '#03ff00'
         },
       ]
 
@@ -59,7 +62,7 @@ export default {
   },
   mounted: function() {
     console.log('$route', this.$route.params.id)
-    this.$root.setCurrent(this.$route.params.id)
+    this.$root.key = this.$route.params.id
   },
   components: {
     'form-fields': FormFields

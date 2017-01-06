@@ -55,49 +55,44 @@ window.app = new Vue({
     pushState: true,
     routes: Routes,
   },
-  // firebase: {
-  //     users: firebase.database().ref('users')
-  // },
+   firebase: {
+       items: firebase.database().ref('null'),
+       item: {
+           source: firebase.database().ref('null'),
+           asObject: true,
+           cancelCallback: function() {}
+       }
+     },
   methods: {
-    addItem: function() {
-      this.$firebaseRefs.items.push({
-        name: Date.now()
-      })
+    addItem: function(item) {
+      this.$firebaseRefs.items.push(item)
     },
     removeItem: function(item) {
       this.$firebaseRefs.items.child(item['.key']).remove()
+    }
+  },
+  watch: {
+    dict: function(value, oldValue) {
+      console.log('DICT changed', value, oldValue)
+      this.$firebaseRefs && this.$firebaseRefs.items && this.$unbind('items')
+      this.$bindAsArray('items', firebase.database().ref(value))
     },
-    setCurrent: function(key) {
-      this.$bindAsObject('item', this.$firebaseRefs.items.child(key))
-
-      this.$itemWatched || this.$watch('item', function(value, oldValue) {
+    key: function(value, oldValue) {
+      console.log('KEY changed', value, oldValue)
+      this.$firebaseRefs && this.$firebaseRefs.items && this.$unbind('item')
+      this.$bindAsObject('item', this.$firebaseRefs.items.child(value))
+    },
+    item: {
+      handler: function(value, oldValue) {
         var res = JSON.parse(JSON.stringify(value))
         delete res['.key']
         console.log('item changed', value, oldValue, value['.key'], Object.keys(value))
         if (value['.key']) {
           this.$firebaseRefs.items.child(value['.key']).set(res)
         }
-      }, {deep: true})
-      this.$itemWatched = true
+      },
+      deep: false//true
     }
-  },
-  watch: {
-    dict: function(value, oldValue) {
-      console.log('DICT changed', value, oldValue)
-      this.$bindAsArray('items', firebase.database().ref(value))
-      // this.items = this.items
-    },
-    // item: {
-    //   handler: function(value, oldValue) {
-    //     var res = JSON.parse(JSON.stringify(value))
-    //     delete res['.key']
-    //     console.log('item changed', value, oldValue, value['.key'], Object.keys(value))
-    //     if (value['.key']) {
-    //       this.$firebaseRefs.items.child(value['.key']).set(res)
-    //     }
-    //   },
-    //   deep: true
-    // }
   },
   // beforeMount : function (value, oldValue) {
   //   // this.dict = 'users'
@@ -105,6 +100,7 @@ window.app = new Vue({
   data: function() {
     return {
       dict: '',
+      key: '',
       // item: {},
       // items: [],
       popupOpened: false,
