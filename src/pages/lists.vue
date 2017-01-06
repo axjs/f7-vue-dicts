@@ -1,6 +1,6 @@
 <template>
 <f7-page>
-  <f7-navbar back-link="Back" title="Lists" sliding></f7-navbar>
+  <f7-navbar back-link="Back" :title="'Dict '+$root.dict" sliding></f7-navbar>
   <f7-fab color="pink">
     <!-- <f7-icon icon="icon-plus" @click="addItem"></f7-icon> -->
     <f7-fab-action color="pink" @click="addItem">A</f7-fab-action>
