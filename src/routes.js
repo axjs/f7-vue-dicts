@@ -19,7 +19,7 @@ export default [{
     component: require('./pages/lists.vue')
   },
   {
-    path: '/edit/:id',
+    path: '/edit/:dict/:key',
     component: require('./pages/edit.vue')
   },
   {

@@ -8,7 +8,9 @@ import Framework7 from 'framework7'
 import Framework7Vue from 'framework7-vue'
 
 import vuefire from 'vuefire'
-import firebase from 'firebase'
+import firebase from './fb.js'
+
+console.log('import')
 
 Vue.use(vuefire)
 
@@ -32,86 +34,47 @@ import App from './app'
 // Init F7 Vue Plugin
 Vue.use(Framework7Vue)
 
-//Init Firebase
-var config = {
-  apiKey: "AIzaSyDc_LHRrNRto4BV23Do8NHsqNdAt26Fz10",
-  authDomain: "data-ab752.firebaseapp.com",
-  databaseURL: "https://data-ab752.firebaseio.com",
-  storageBucket: "data-ab752.appspot.com",
-  messagingSenderId: "141730081452"
-};
-
-firebase.initializeApp(config);
+// //Init Firebase
+// var config = {
+//     apiKey: "AIzaSyDc_LHRrNRto4BV23Do8NHsqNdAt26Fz10",
+//     authDomain: "data-ab752.firebaseapp.com",
+//     databaseURL: "https://data-ab752.firebaseio.com",
+//     storageBucket: "data-ab752.appspot.com",
+//     messagingSenderId: "141730081452"
+// };
+//
+// firebase.initializeApp(config);
+// window.firebase = firebase
 
 // Init App
 window.app = new Vue({
-  el: '#app',
-  template: '<app/>',
-  // Init Framework7 by passing parameters here
-  framework7: {
-    root: '#app',
-    /* Uncomment to enable Material theme: */
-    // material: true,
-    pushState: true,
-    routes: Routes,
-  },
-   firebase: {
-       items: firebase.database().ref('null'),
-       item: {
-           source: firebase.database().ref('null'),
-           asObject: true,
-           cancelCallback: function() {}
-       }
-     },
-  methods: {
-    addItem: function(item) {
-      this.$firebaseRefs.items.push(item)
+    el: '#app',
+    template: '<app/>',
+    data: function() {
+        return {
+            key: '',
+            // item: {},
+            // items: [],
+            popupOpened: false,
+            loginScreenOpened: false,
+            pickerOpened: false,
+            actionsOpened: false
+        };
     },
-    removeItem: function(item) {
-      this.$firebaseRefs.items.child(item['.key']).remove()
-    }
-  },
-  watch: {
-    dict: function(value, oldValue) {
-      console.log('DICT changed', value, oldValue)
-      this.$firebaseRefs && this.$firebaseRefs.items && this.$unbind('items')
-      this.$bindAsArray('items', firebase.database().ref(value))
+    // Init Framework7 by passing parameters here
+    framework7: {
+        root: '#app',
+        /* Uncomment to enable Material theme: */
+        // material: true,
+        pushState: true,
+        routes: Routes,
     },
-    key: function(value, oldValue) {
-      console.log('KEY changed', value, oldValue)
-      this.$firebaseRefs && this.$firebaseRefs.items && this.$unbind('item')
-      this.$bindAsObject('item', this.$firebaseRefs.items.child(value))
-    },
-    item: {
-      handler: function(value, oldValue) {
-        var res = JSON.parse(JSON.stringify(value))
-        delete res['.key']
-        console.log('item changed', value, oldValue, value['.key'], Object.keys(value))
-        if (value['.key']) {
-          this.$firebaseRefs.items.child(value['.key']).set(res)
-        }
-      },
-      deep: false//true
-    }
-  },
-  // beforeMount : function (value, oldValue) {
-  //   // this.dict = 'users'
-  // },
-  data: function() {
-    return {
-      dict: '',
-      key: '',
-      // item: {},
-      // items: [],
-      popupOpened: false,
-      loginScreenOpened: false,
-      pickerOpened: false,
-      actionsOpened: false
-    };
-  },
+    // beforeMount : function (value, oldValue) {
+    //   // this.dict = 'users'
+    // },
 
-  // Register App Component
-  components: {
-    app: App
-  }
+    // Register App Component
+    components: {
+        app: App
+    }
 });
