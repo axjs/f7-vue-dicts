@@ -63,7 +63,7 @@
           });
           // [END authanon]
         }
-        document.getElementById('quickstart-sign-in').disabled = true;
+        // document.getElementById('quickstart-sign-in').disabled = true;
       }
     },
     beforeCreate: function () {
