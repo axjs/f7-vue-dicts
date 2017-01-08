@@ -1,7 +1,7 @@
 <template>
 
   <!-- Login Screen -->
-  <f7-login-screen id="login-screen">
+  <f7-login-screen id="login-screen" v-show="false">
     <f7-view>
       <f7-pages>
         <f7-page login-screen>
@@ -9,20 +9,20 @@
           <f7-list form v-if="!user">
             <f7-list-item>
               <f7-label>Username</f7-label>
-              <f7-input name="username" placeholder="Username" type="text" autofocus></f7-input>
+              <f7-input name="username" placeholder="Username" type="text" autofocus v-model="email"></f7-input>
             </f7-list-item>
             <f7-list-item>
               <f7-label>Password</f7-label>
-              <f7-input name="password" type="password" placeholder="Password"></f7-input>
+              <f7-input name="password" type="password" placeholder="Password" v-model="password"></f7-input>
             </f7-list-item>
           </f7-list>
           <f7-list>
-            <f7-list-button v-if="!user" title="Sign In" close-login-screen></f7-list-button>
+            <f7-list-button v-if="!user" title="Sign In" @click="signInWithEmailAndPassword"></f7-list-button>
             <f7-list-label v-if="!user">
               <p>Click Sign In to close Login Screen</p>
             </f7-list-label>
             <f7-list-button v-if="!user" title="Guest sign in" @click="signInAnonymously" close-login-screen></f7-list-button>
-            <f7-list-button v-if="user" title="Sign Out" @click="signOut" close-login-screen></f7-list-button>
+            <f7-list-button v-if="user" title="Sign Out" @click="signOut"close-login-screen></f7-list-button>
             <!--<f7-list-button title="toggleSignIn" @click="toggleSignIn"></f7-list-button>-->
           </f7-list>
         </f7-page>
@@ -37,19 +37,24 @@
   import firebase from './fb.js'
 
   export default {
+
     data: function () {
       return {
         user: null,
+        email: '',
+        password: '',
+        error: ''
       };
     },
+
     computed: {
       name: function () {
         var name = 'Not login'
         if (this.user) {
           if (this.user.isAnonymous) {
-            name = 'guest'
+            name = 'guest ' + this.user.displayName
           } else {
-            name = this.user.uid
+            name = this.user.displayName
           }
         }
         return name
@@ -58,41 +63,70 @@
 
     methods: {
       signOut: function () {
+        var vm = this
         if (firebase.auth().currentUser) {
-          firebase.auth().signOut();
+          this.$f7.confirm('Are you sure?', function () {
+            firebase.auth().signOut();
+            vm.$f7.closeModal('#login-screen')
+          });
         }
       },
+
       signInAnonymously: function () {
+        var vm = this
         if (firebase.auth().currentUser) {
-          alert('Already signed')
+          vm.$f7.alert('Already signed')
           return;
         }
-        firebase.auth().signInAnonymously().catch(function (error) {
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          if (errorCode === 'auth/operation-not-allowed') {
-            alert('You must enable Anonymous auth in the Firebase Console.');
-          } else {
-            console.error(error);
-          }
-        });
-      },
-      toggleSignIn: function () {
-        console.log('toggleSignIn')
-        if (firebase.auth().currentUser) {
-          firebase.auth().signOut();
-        } else {
-          firebase.auth().signInAnonymously().catch(function (error) {
+        firebase.auth().signInAnonymously()
+          .then(function (error) {
+            vm.$f7.closeModal('#login-screen')
+          })
+          .catch(function (error) {
             var errorCode = error.code;
             var errorMessage = error.message;
             if (errorCode === 'auth/operation-not-allowed') {
-              alert('You must enable Anonymous auth in the Firebase Console.');
+              vm.$f7.alert('You must enable Anonymous auth in the Firebase Console.', 'Firebase');
             } else {
+              vm.$f7.alert(errorMessage, 'Firebase')
               console.error(error);
             }
           });
+      },
+
+      signInWithEmailAndPassword: function () {
+        var vm = this
+        if (firebase.auth().currentUser) {
+          firebase.auth().signOut();
+        } else {
+          var email = this.email;
+          var password = this.password;
+          this.password = ''
+          if (email.length < 4) {
+            vm.$f7.alert('Please enter an email address.');
+            return;
+          }
+          if (password.length < 4) {
+            vm.$f7.alert('Please enter a password.');
+            return;
+          }
+          firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(function (error) {
+              vm.$f7.closeModal('#login-screen')
+            })
+            .catch(function (error) {
+              // Handle Errors here.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              if (errorCode === 'auth/wrong-password') {
+                vm.$f7.alert('Wrong password.', 'Firebase');
+              } else {
+                vm.$f7.alert(errorMessage, 'Firebase');
+              }
+              console.log(error);
+              vm.error = errorMessage;
+            });
         }
-        // document.getElementById('quickstart-sign-in').disabled = true;
       }
     },
     beforeCreate: function () {
@@ -101,16 +135,6 @@
         console.log('USER', user, this, vm)
         vm.user = user
         vm.$root.user = user
-        // if (user) {
-        //   // User is signed in.
-        //   var isAnonymous = user.isAnonymous;
-        //   var uid = user.uid;
-        //   // ...
-        // } else {
-        //   // User is signed out.
-        //   // ...
-        // }
-        // // ...
       })
     }, // 2.x
     beforeDestroy: function () {
