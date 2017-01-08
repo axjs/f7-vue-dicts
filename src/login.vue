@@ -18,11 +18,12 @@
           </f7-list>
           <f7-list>
             <f7-list-button v-if="!user" title="Sign In" @click="signInWithEmailAndPassword"></f7-list-button>
+            <f7-list-button v-if="!user" title="Sign in by Google" @click="signInWithRedirectGoogle"></f7-list-button>
             <f7-list-label v-if="!user">
               <p>Click Sign In to close Login Screen</p>
             </f7-list-label>
             <f7-list-button v-if="!user" title="Guest sign in" @click="signInAnonymously" close-login-screen></f7-list-button>
-            <f7-list-button v-if="user" title="Sign Out" @click="signOut"close-login-screen></f7-list-button>
+            <f7-list-button v-if="user" title="Sign Out" @click="signOut" close-login-screen></f7-list-button>
             <!--<f7-list-button title="toggleSignIn" @click="toggleSignIn"></f7-list-button>-->
           </f7-list>
         </f7-page>
@@ -92,6 +93,35 @@
               console.error(error);
             }
           });
+      },
+
+      signInWithPopupGoogle: function () {
+        var vm = this
+        var provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('https://www.googleapis.com/auth/plus.login');
+        firebase.auth().signInWithPopup(provider).then(function (result) {
+          var token = result.credential.accessToken;
+          var user = result.user;
+          vm.$f7.alert(token);
+        }).catch(function (error) {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          var email = error.email;
+          var credential = error.credential;
+          if (errorCode === 'auth/account-exists-with-different-credential') {
+            vm.$f7.alert('You have already signed up with a different auth provider for that email.');
+          } else {
+            vm.$f7.alert(errorMessage, errorCode)
+            console.error(error);
+          }
+        })
+      },
+
+      signInWithRedirectGoogle: function () {
+        var vm = this
+        var provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('https://www.googleapis.com/auth/plus.login');
+        firebase.auth().signInWithRedirect(provider);
       },
 
       signInWithEmailAndPassword: function () {
