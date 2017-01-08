@@ -46,11 +46,33 @@ Vue.use(Framework7Vue)
 // firebase.initializeApp(config);
 // window.firebase = firebase
 
+firebase.auth().onAuthStateChanged(function (user) {
+    console.log('USER', user)
+    // if (user) {
+    //   // User is signed in.
+    //   var isAnonymous = user.isAnonymous;
+    //   var uid = user.uid;
+    //   // ...
+    // } else {
+    //   // User is signed out.
+    //   // ...
+    // }
+    // // ...
+})
+
+firebase.auth().signInAnonymously().catch(function (error) {
+    console.error('ERROR', error)
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    // ...
+});
+
 // Init App
 window.app = new Vue({
     el: '#app',
     template: '<app/>',
-    data: function() {
+    data: function () {
         return {
             key: '',
             // item: {},
