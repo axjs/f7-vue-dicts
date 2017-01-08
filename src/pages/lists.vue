@@ -36,16 +36,9 @@
 
     watch: {
       key: function (value, oldValue) {
-        console.log('DICT changed', value, oldValue)
+        console.log('key changed', value, oldValue)
         this.$firebaseRefs && this.$firebaseRefs.items && this.$unbind('items')
         this.$bindAsArray('items', firebase.database().ref(value))
-      },
-      $route: {
-        handler: function (value, oldValue) {
-          console.log('$ROUTE changed', value, oldValue)
-          this.key = this.$route.params.name
-        },
-        deep: true
       }
     },
 
