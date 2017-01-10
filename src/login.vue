@@ -1,7 +1,7 @@
 <template>
 
   <!-- Login Screen -->
-  <f7-login-screen id="login-screen" v-show="false">
+  <f7-login-screen id="login-screen">
     <f7-view>
       <f7-pages>
         <f7-page login-screen>

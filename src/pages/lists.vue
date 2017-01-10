@@ -24,6 +24,8 @@
   import firebase from '../fb.js'
 
   export default {
+    name: 'FirebaseList',
+
     data: function () {
       return {
         key: '',
@@ -36,6 +38,9 @@
 
     watch: {
       key: function (value, oldValue) {
+        if (value === oldValue)
+          return
+       
         console.log('key changed', value, oldValue)
         this.$firebaseRefs && this.$firebaseRefs.items && this.$unbind('items')
         this.$bindAsArray('items', firebase.database().ref(value))

@@ -11,6 +11,8 @@
   import FormFields from './form-fields.vue'
 
   export default {
+    name: 'FirebaseEdit',
+
     data: function () {
       return {
         // item: {}
