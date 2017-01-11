@@ -65,7 +65,9 @@
       item: {
         source: firebase.database().ref(),
         asObject: true,
-        cancelCallback: function () { }
+        cancelCallback: function () {
+          console.error('cancelCallback')
+        }
       }
     },
     watch: {
@@ -76,11 +78,19 @@
       },
       item: {
         handler: function (value, oldValue) {
+          var vm = this
           var res = JSON.parse(JSON.stringify(value))
           delete res['.key']
           console.log('item changed', value, oldValue, value['.key'], Object.keys(value))
           if (value['.key']) {
             firebase.database().ref(this.key).set(res)
+              .then(function () {
+                // console.log('Synchronization succeeded');
+              })
+              .catch(function (error) {
+                console.log('Synchronization failed', error);
+                vm.$f7.alert(error, 'Firebase')
+              });
           }
         },
         deep: true
