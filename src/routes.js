@@ -1,4 +1,9 @@
-export default [{
+export default [
+  {
+    path: '/',
+    component: require('./pages/main.vue')
+  },
+  {
     path: '/about/',
     component: require('./pages/about.vue')
   },
