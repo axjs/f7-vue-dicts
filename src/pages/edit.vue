@@ -68,13 +68,20 @@
         cancelCallback: function () {
           console.error('cancelCallback')
         }
-      }
+      }, 
+      // fields : firebase.database().ref('null'),
     },
     watch: {
       key: function (value, oldValue) {
-        console.log('KEY changed', value, oldValue)
+        console.log('KEY changed', value, oldValue, '_dicts/' + value.split('/').slice(0, -1).join('/'))
+        // bind fields
+        // this.$firebaseRefs && this.$firebaseRefs.fields && this.$unbind('fields')
+        // this.$bindAsObject('fields', firebase.database().ref( '_dicts/' + value.split('/').slice(0, -1).join('/')+'/fields' ))
+
+          // bind item
         this.$firebaseRefs && this.$firebaseRefs.item && this.$unbind('item')
         this.$bindAsObject('item', firebase.database().ref(value))
+
       },
       item: {
         handler: function (value, oldValue) {
