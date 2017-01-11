@@ -42,7 +42,6 @@ Vue.use(Framework7Vue)
 // });
 
 // Init App
-console.log('!!!', window.app)
 window.app = new Vue({
   el: '#app',
   template: '<app/>',
@@ -52,8 +51,18 @@ window.app = new Vue({
       popupOpened: false,
       loginScreenOpened: false,
       pickerOpened: false,
-      actionsOpened: false
+      actionsOpened: false,
     };
+  },
+  firebase: {
+    // items: firebase.database().ref('null'),
+    dicts: {
+      source: firebase.database().ref('_dicts'),
+      asObject: true,
+      cancelCallback: function () {
+        console.error('cancelCallback')
+      }
+    }
   },
   // Init Framework7 by passing parameters here
   framework7: {
@@ -65,7 +74,7 @@ window.app = new Vue({
     preroute: function (view, options) {
       console.log('preroute', app)
       if (!firebase.auth().currentUser) {
-         app.$f7.loginScreen()
+        app.$f7.loginScreen()
         // view.router.loadPage('auth.html'); //load another page with auth form
         return false; //required to prevent default router action
       } else {

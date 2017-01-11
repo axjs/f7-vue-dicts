@@ -63,7 +63,7 @@
     firebase: {
       // items: firebase.database().ref('null'),
       item: {
-        source: firebase.database().ref(),
+        source: firebase.database().ref('null'),
         asObject: true,
         cancelCallback: function () {
           console.error('cancelCallback')
