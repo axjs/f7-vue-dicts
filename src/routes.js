@@ -20,11 +20,11 @@ export default [
     component: require('./pages/data-binding.vue')
   },
   {
-    path: '/lists/:name',
+    path: '/lists/',
     component: require('./pages/lists.vue')
   },
   {
-    path: '/edit/:dict/:key',
+    path: '/edit/',
     component: require('./pages/edit.vue')
   },
   {

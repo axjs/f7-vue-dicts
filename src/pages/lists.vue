@@ -8,7 +8,7 @@
     <f7-navbar back-link="Back" :title="'Dict '+key" sliding></f7-navbar>
     <!-- <f7-block-title co>List</f7-block-title> -->
     <f7-list contacts>
-      <f7-list-item swipeout :link="/edit/+key+'/'+item['.key']" :key="item['.key']" v-for="item in items" :title="item.name" :badge="item['.key']"
+      <f7-list-item swipeout :link="'/edit#'+key+'/'+item['.key']" :key="item['.key']" v-for="item in items" :title="item.name" :badge="item['.key']"
         badge-color="red">
         <f7-swipeout-actions>
           <f7-swipeout-button delete @click="removeItem(item)">Delete</f7-swipeout-button>
@@ -59,7 +59,7 @@
     },
 
     beforeMount: function () {
-      this.key = this.$route.params.name
+      this.key = this.$route.hash
     }
   }
 </script>

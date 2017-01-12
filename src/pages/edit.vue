@@ -1,6 +1,7 @@
 <template>
   <f7-page>
     <f7-navbar back-link="Back" :title="key" sliding></f7-navbar>
+    <input type="file" id="file" name="file" @change="handleFileSelect" />
     <form-fields :fields="fields" :item="item"></form-fields>
   </f7-page>
 </template>
@@ -68,8 +69,29 @@
         cancelCallback: function () {
           console.error('cancelCallback')
         }
-      }, 
+      },
       // fields : firebase.database().ref('null'),
+    },
+    methods: {
+      handleFileSelect: function (evt) {
+        console.log('handleFileSelect', evt)
+        evt.stopPropagation();
+        evt.preventDefault();
+
+        var file = evt.target.files[0];
+        var metadata = {
+          'contentType': file.type
+        };
+        firebase.storage().ref().child('images/' + file.name).put(file, metadata).then(function (snapshot) {
+          console.log('Uploaded', snapshot.totalBytes, 'bytes.');
+          console.log(snapshot.metadata);
+          var url = snapshot.metadata.downloadURLs[0];
+          console.log('File available at', url);
+        }).catch(function (error) {
+          console.error('Upload failed:', error);
+        });
+      }
+
     },
     watch: {
       key: function (value, oldValue) {
@@ -78,7 +100,7 @@
         // this.$firebaseRefs && this.$firebaseRefs.fields && this.$unbind('fields')
         // this.$bindAsObject('fields', firebase.database().ref( '_dicts/' + value.split('/').slice(0, -1).join('/')+'/fields' ))
 
-          // bind item
+        // bind item
         this.$firebaseRefs && this.$firebaseRefs.item && this.$unbind('item')
         this.$bindAsObject('item', firebase.database().ref(value))
 
@@ -105,7 +127,7 @@
     },
     mounted: function () {
       console.log('$route', this.$route.params.key, this.$route)
-      this.key = this.$route.path.substring(6)
+      this.key = this.$route.hash
     },
     components: {
       'form-fields': FormFields

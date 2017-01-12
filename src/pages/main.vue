@@ -12,10 +12,10 @@
       <f7-list-item link="/dynamic-route/blog/45/post/125/?foo=bar#about" title="Dynamic Route"></f7-list-item>
       <f7-list-item link="/data-binding/" title="data-binding"></f7-list-item>
       <f7-list-item link="/data-binding-edit/" title="data-binding-edit"></f7-list-item>
-      <f7-list-item link="/lists/users" title="users"></f7-list-item>
-      <f7-list-item link="/lists/goods" title="goods"></f7-list-item>
-      <f7-list-item link="/lists/cats" title="cats"></f7-list-item>
-      <f7-list-item link="/lists/dicts" title="dicts"></f7-list-item>
+      <f7-list-item link="/lists#users" title="users"></f7-list-item>
+      <f7-list-item link="/lists#goods" title="goods"></f7-list-item>
+      <f7-list-item link="/lists#cats" title="cats"></f7-list-item>
+      <f7-list-item link="/lists#dicts" title="dicts"></f7-list-item>
     </f7-list>
     <f7-block-title>Side Panels</f7-block-title>
     <f7-block>
