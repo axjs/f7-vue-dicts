@@ -28,6 +28,10 @@ export default [
     component: require('./pages/edit.vue')
   },
   {
+    path: '/webshoot/',
+    component: require('./pages/webshoot.vue')
+  },
+  {
     path: '/data-binding-edit/',
     component: require('./pages/data-binding-edit.vue')
   }

@@ -16,6 +16,7 @@
       <f7-list-item link="/lists#goods" title="goods"></f7-list-item>
       <f7-list-item link="/lists#cats" title="cats"></f7-list-item>
       <f7-list-item link="/lists#dicts" title="dicts"></f7-list-item>
+      <f7-list-item link="/webshoot" title="webshoot"></f7-list-item>
     </f7-list>
     <f7-block-title>Side Panels</f7-block-title>
     <f7-block>
