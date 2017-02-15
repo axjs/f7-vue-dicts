@@ -76,71 +76,38 @@
   }
 
   var sendPage = function (page) {
-    console.log('firebase.storage0')
+    if (!page.type)
+      page.type = 'text/html;charset=utf-8';
+    else
+      page.type = page.type.match(/^[^;]+/) + ';charset=utf-8';
+
     var metadata = {
-      'contentType': page.type //'text/html'
+      'contentType': page.type
     };
-    var id = Date.now()   //page.url
-    firebase.storage().ref().child('ws/' + id).putString(page.html, 'raw', metadata).then(function (snapshot) {
+
+
+    var key = firebase.database().ref().child('ws').push().key;
+    firebase.storage().ref().child('ws/' + key).putString(page.html, 'raw', metadata).then(function (snapshot) {
+      
+      firebase.database().ref('ws/' + key).set({
+        title: page.title,
+        url: page.url,
+        downloadURL:  snapshot.downloadURL,
+        totalBytes: snapshot.totalBytes
+      });
+
       console.log('Uploaded', snapshot.totalBytes, 'bytes.');
       console.log(snapshot.metadata);
       var url = snapshot.metadata.downloadURLs[0];
       console.log('File available at', url);
+      window.location.assign(url)
+      // var win = window.open(url, '_blank');
+      // win.focus();
     }).catch(function (error) {
       console.error('Upload failed:', error);
     });
-    console.log('firebase.storage')
-    return
-
-    var url = page.url,
-      type = page.type,
-      html = page.html;
-
-    if (!type) type = 'text/html;charset=utf-8';
-    else type = type.match(/^[^;]+/) + ';charset=utf-8';
-
-    var sa = 'setAttribute',
-      ac = 'appendChild';
-    /*
-    form(
-        'method'        : 'post',
-        'action'        : serviceHost,
-        'enctype'       : 'multipart/form-data',
-        'accept-charset': 'utf-8';
-        input(
-            'type'  : 'hidden',
-            'name'  : 'r_url',
-            'value' : url
-        ),
-        input(
-            'type'  : 'hidden',
-            'name'  : 'r_url',
-            'value' : url
-        )
-    )
-    */
-    var form = document.createElement('form');
-    form[sa]('method', 'post');
-    form[sa]('action', serviceHost);
-    form[sa]('enctype', 'multipart/form-data');
-    form[sa]('accept-charset', 'utf-8');
-    var input = document.createElement('input');
-    input[sa]('type', 'hidden');
-    input[sa]('name', 'r_url');
-    input[sa]('value', url);
-    form[ac](input);
-    input = input.cloneNode(false);
-    input[sa]('name', 'r_type');
-    input[sa]('value', type);
-    form[ac](input);
-    input = input.cloneNode(false);
-    input[sa]('name', 'r_html');
-    input[sa]('value', html);
-    form[ac](input);
-    document.body[ac](form);
-    form.submit();
-    document.body.removeChild(form);
   };
+
   var showLoad = function () {
     if (document.getElementById('_____ax_____')) return;
     var div = document.createElement('div'),
@@ -168,19 +135,6 @@
         s.parentElement.removeChild(s);
       }
 
-      //insert base 
-      //            s = document.createElement('base');
-      //            s[sa]('href', (location.origin || location.host) + location.pathname);
-      //            //            head && (head.firstChild ? (head.insertBefore(s, head.firstChild)) : (head.appendChild(s)));
-      //            head && head.parentElement.insertBefore(s, head);
-
-      //            s = document.createElement('base');
-      //            s[sa]('href', (location.origin || location.host) + location.pathname);
-      //            doc.insertBefore(s, doc.firstChild);
-      //            s = document.createElement('meta');
-      //            s[sa]('http-equiv', 'Content-Type');
-      //            s[sa]('content', 'text/html; charset=UTF-8');
-      //            doc.insertBefore(s, doc.firstChild);
 
       title = title ? title.text : '';
       s = '<!DOCTYPE html><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">' +
@@ -196,10 +150,6 @@
       var html = s + docHtml();
       document.title = "Process... " + document.title;
 
-      //        var r = new XMLHttpRequest();
-      //        r.open('GET', url, true);
-      //r.overrideMimeType('application/octet-stream');
-      //        r.onreadystatechange = function() {
       try {
         sendPage({
           url: url,
@@ -207,20 +157,10 @@
           html: html,
           title: title
         });
-        //                if (r.readyState == 4) {
-        //                    if ((r.status >= 200 && r.status < 300) || (r.status >= 400 && r.status < 500)) {
-        //                        send(url, r.responseText, r.getResponseHeader('Content-type'), html);
-        //                    }
-        //                    else {
-        //                        throw r.statusText;
-        //                    }
-        //                }
       }
       catch (e) {
         alert('Error: ' + e + '\nPlease, try again');
       }
-      //        };
-      //        r.send(null);
       document.title = document.title.substring(11);
     }
     catch (e) {
