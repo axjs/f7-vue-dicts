@@ -82,7 +82,11 @@
       page.type = page.type.match(/^[^;]+/) + ';charset=utf-8';
 
     var metadata = {
-      'contentType': page.type
+      contentType: page.type,
+      customMetadata : {
+        'title' : page.title,
+        'url' : page.url
+      }
     };
 
 
