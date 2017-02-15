@@ -8,20 +8,19 @@
     <f7-navbar back-link="Back" :title="'Dict '+key" sliding></f7-navbar>
     <!-- <f7-block-title co>List</f7-block-title> -->
     <f7-list contacts>
-      <f7-list-item swipeout :link="'/edit#'+key+'/'+item['.key']" :key="item['.key']" v-for="item in items" :title="item.name" :badge="item['.key']"
-        badge-color="red">
+      <f7-list-item swipeout :link="item.downloadURL || '#'" :link-external="true" :key="item['.key']" v-for="item in items" :title="item.title"
+        :badge="item['totalBytes'] || false" badge-color="red">
         <f7-swipeout-actions>
-          <f7-swipeout-button delete @click="removeItem(item)">Delete</f7-swipeout-button>
+          <f7-swipeout-button @click="removeItem(item)">Delete</f7-swipeout-button>
         </f7-swipeout-actions>
-      </f7-list-item>
+        </f7-list-item>
     </f7-list>
 
   </f7-page>
 </template>
 <script>
-
   import firebase from '../fb-webshot.js'
-
+  window.firebase = firebase
   export default {
     name: 'FirebaseList',
 
@@ -39,7 +38,7 @@
       key: function (value, oldValue) {
         if (value === oldValue)
           return
-       
+
         console.log('key changed', value, oldValue)
         this.$firebaseRefs && this.$firebaseRefs.items && this.$unbind('items')
         this.$bindAsArray('items', firebase.database().ref(value))
@@ -47,18 +46,39 @@
     },
 
     methods: {
+      clicked: function (item) {
+        console.log('clicked', item)
+        var url = item.downloadURL
+        if (url) {
+          var win = window.open(item.url, '_blank');
+          win && win.focus();
+        }
+      },
       addItem: function () {
-        this.$firebaseRefs.items.push({
-          name: 'ax'
-        })
+        // this.$firebaseRefs.items.push({
+        //   name: 'ax'
+        // })
       },
       removeItem: function (item) {
-        this.$firebaseRefs.items.child(item['.key']).remove()
+        var alert = this.$f7.alert
+
+        this.$f7.confirm('Are you sure?', 'Firebase', function () {
+          firebase.storage().ref().child('ws/' + item['.key']).delete().then(function () {
+            this.$firebaseRefs.items.child(item['.key']).remove()
+            console.log('ok')
+          }).catch(function (error) {
+            error && error.message && alert(error.message, 'Firebase')
+            
+            console.log(error)
+          });
+        });
+
       }
     },
 
     beforeMount: function () {
-      this.key = this.$route.hash
+      this.key = 'ws' //this.$route.hash
     }
   }
+
 </script>
