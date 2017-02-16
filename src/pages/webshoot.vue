@@ -5,13 +5,13 @@
       <f7-fab-action color="pink" @click="addItem">A</f7-fab-action>
     </f7-fab>
 
-    <f7-navbar back-link="Back" :title="'Dict '+key" sliding></f7-navbar>
+    <f7-navbar back-link="Back" :title="'WebShoot '+key" sliding></f7-navbar>
     <!-- <f7-block-title co>List</f7-block-title> -->
     <f7-list contacts>
-      <f7-list-item swipeout :link="item.downloadURL || '#'" :link-external="true" :key="item['.key']" v-for="item in items" :title="item.title"
-        :badge="item['totalBytes'] || false" badge-color="red">
-        <f7-swipeout-actions>
-          <f7-swipeout-button @click="removeItem(item)">Delete</f7-swipeout-button>
+      <f7-list-item swipeout link="#" @click="clicked(item)" :key="item['.key']" v-for="item in items" :title="item.title"
+        :badge="item['counter'] || 0" badge-color="red">
+        <f7-swipeout-actions left>
+          <f7-swipeout-button color="red" @click="removeItem(item)">Delete</f7-swipeout-button>
         </f7-swipeout-actions>
         </f7-list-item>
     </f7-list>
@@ -19,10 +19,10 @@
   </f7-page>
 </template>
 <script>
-  import firebase from '../fb-webshot.js'
-  window.firebase = firebase
+  import firebase from '../fb.js'
+
   export default {
-    name: 'FirebaseList',
+    name: 'WebShootList',
 
     data: function () {
       return {
@@ -47,10 +47,13 @@
 
     methods: {
       clicked: function (item) {
-        console.log('clicked', item)
-        var url = item.downloadURL
+        var counter = item.counter || 0
+        firebase.database().ref(this.key + '/' + item['.key']).child('counter').set(++counter)
+
+        console.log('clicked', item, counter)
+        var url = item.downloadURL || item.url
         if (url) {
-          var win = window.open(item.url, '_blank');
+          var win = window.open(url, '_blank');
           win && win.focus();
         }
       },
@@ -61,10 +64,11 @@
       },
       removeItem: function (item) {
         var alert = this.$f7.alert
+        var $firebaseRefs = this.$firebaseRefs
 
-        this.$f7.confirm('Are you sure?', 'Firebase', function () {
+        this.$f7.confirm('Are you sure to delete ?<br><br>'+item.title , 'Firebase', function () {
           firebase.storage().ref().child('ws/' + item['.key']).delete().then(function () {
-            this.$firebaseRefs.items.child(item['.key']).remove()
+            $firebaseRefs.items.child(item['.key']).remove()
             console.log('ok')
           }).catch(function (error) {
             error && error.message && alert(error.message, 'Firebase')

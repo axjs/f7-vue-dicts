@@ -1,7 +1,7 @@
 
 import firebase from 'firebase'
 
-console.log('init firebase')
+console.log('init firebase webshoot')
 
 
 //Init Firebase
