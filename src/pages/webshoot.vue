@@ -6,10 +6,19 @@
     </f7-fab>
 
     <f7-navbar back-link="Back" :title="'WebShoot '+key" sliding></f7-navbar>
-    <!-- <f7-block-title co>List</f7-block-title> -->
-    <f7-list contacts>
-      <f7-list-item swipeout link="#" @click="clicked(item)" :key="item['.key']" v-for="item in items" :title="item.title"
-        :badge="item['counter'] || 0" badge-color="red">
+
+    <!-- Search bar -->
+    <f7-searchbar cancel-link="Отмена" search-list="#search-list" placeholder="Поиск ..." :clear-button="true"></f7-searchbar>
+
+    <!-- Will be visible if there is no any results found, defined by "searchbar-not-found" class -->
+    <f7-list class="searchbar-not-found">
+      <f7-list-item title="Не найдено ..."></f7-list-item>
+    </f7-list>
+
+    <!--<f7-block-title co>WebShoot</f7-block-title>-->
+    <f7-list contacts id="search-list">
+      <f7-list-item swipeout link="#" @click="clicked(item)" :key="item['.key']" v-for="item in items" :title="item.title" :badge="item['counter'] || 0"
+        badge-color="red">
         <f7-swipeout-actions left>
           <f7-swipeout-button color="red" @click="removeItem(item)">Delete</f7-swipeout-button>
         </f7-swipeout-actions>
@@ -66,13 +75,13 @@
         var alert = this.$f7.alert
         var $firebaseRefs = this.$firebaseRefs
 
-        this.$f7.confirm('Are you sure to delete ?<br><br>'+item.title , 'Firebase', function () {
+        this.$f7.confirm('Are you sure to delete ?<br><br>' + item.title, 'Firebase', function () {
           firebase.storage().ref().child('ws/' + item['.key']).delete().then(function () {
             $firebaseRefs.items.child(item['.key']).remove()
             console.log('ok')
           }).catch(function (error) {
             error && error.message && alert(error.message, 'Firebase')
-            
+
             console.log(error)
           });
         });
