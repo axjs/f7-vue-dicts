@@ -17,7 +17,17 @@
 
     <!--<f7-block-title co>WebShoot</f7-block-title>-->
     <f7-list contacts id="search-list">
-      <f7-list-item swipeout link="#" @click="clicked(item)" :key="item['.key']" v-for="item in items" :title="item.title" :badge="item['counter'] || 0"
+      <f7-list-item smart-select smart-select-back-on-select title="Сортировка">
+        <select name="sort" v-model="sort">
+          <option value="">Без сортировки</option>
+          <option value="!">Revers</option>
+          <option value="title">По названию</option>
+          <option value="!title">По названию (реверс)</option>
+          <option value="counter">По количеству</option>
+          <option value="!counter">По количеству (реверс)</option>
+        </select>
+      </f7-list-item>
+      <f7-list-item swipeout link="#" @click="clicked(item)" :key="item['.key']" v-for="item in sorted" :title="item.title" :badge="item['counter'] || 0"
         badge-color="red">
         <f7-swipeout-actions left>
           <f7-swipeout-button color="red" @click="removeItem(item)">Delete</f7-swipeout-button>
@@ -36,6 +46,7 @@
     data: function () {
       return {
         key: '',
+        sort: '!title'
       }
     },
 
@@ -43,6 +54,39 @@
       items: firebase.database().ref('null'),
     },
 
+    computed: {
+      sorted: function () {
+        if (this.sort === '!') {
+          return this.items.reverse()
+        } else if (this.sort === 'counter') {
+          return this.items.sort(function (a, b) {
+            var a1 = a.counter || 0
+            var b1 = b.counter || 0
+            return a1 - b1
+          })
+        } else if (this.sort === '!counter') {
+          return this.items.sort(function (a, b) {
+            var a1 = a.counter || 0
+            var b1 = b.counter || 0
+            return a1 - b1
+          }).reverse()
+        } else if (this.sort === 'title') {
+          return this.items.sort(function (a, b) {
+            var a1 = a.title
+            var b1 = b.title
+            return a1 === b1 ? 0 : (a1 > b1 ? 1 : -1)
+          })
+        } else if (this.sort === '!title') {
+          return this.items.sort(function (a, b) {
+            var a1 = a.title
+            var b1 = b.title
+            return a1 === b1 ? 0 : (a1 > b1 ? 1 : -1)
+          }).reverse()
+        } else {
+          return this.items
+        }
+      }
+    },
     watch: {
       key: function (value, oldValue) {
         if (value === oldValue)
