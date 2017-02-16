@@ -73,8 +73,9 @@ window.app = new Vue({
     routes: Routes,
     preroute: function (view, options) {
       console.log('preroute', app)
+
       if (!firebase.auth().currentUser) {
-        app.$f7.loginScreen()
+        window.f7.loginScreen()
         // view.router.loadPage('auth.html'); //load another page with auth form
         return false; //required to prevent default router action
       } else {

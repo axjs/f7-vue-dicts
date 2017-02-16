@@ -32,6 +32,9 @@
         <f7-swipeout-actions left>
           <f7-swipeout-button color="red" @click="removeItem(item)">Delete</f7-swipeout-button>
         </f7-swipeout-actions>
+        <f7-swipeout-actions right>
+          <f7-swipeout-button color="green"">{{formatBytes(item.totalBytes)}}</f7-swipeout-button>
+        </f7-swipeout-actions>
         </f7-list-item>
     </f7-list>
 
@@ -39,6 +42,8 @@
 </template>
 <script>
   import firebase from '../fb.js'
+  import { formatBytes } from '../util.js'
+  console.log('formatBytes', formatBytes)
 
   export default {
     name: 'WebShootList',
@@ -46,7 +51,7 @@
     data: function () {
       return {
         key: '',
-        sort: '!title'
+        sort: ''
       }
     },
 
@@ -99,6 +104,7 @@
     },
 
     methods: {
+      formatBytes: formatBytes,
       clicked: function (item) {
         var counter = item.counter || 0
         firebase.database().ref(this.key + '/' + item['.key']).child('counter').set(++counter)
