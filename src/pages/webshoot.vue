@@ -15,7 +15,7 @@
     </f7-list>
 
     <!--<f7-block-title co>WebShoot</f7-block-title>-->
-    <f7-list media-list contacts id="search-list">
+    <f7-list media-list id="search-list">
       <f7-list-item smart-select smart-select-back-on-select title="Сортировка">
         <select name="sort" v-model="sort">
           <option value="">Без сортировки</option>
@@ -24,10 +24,12 @@
           <option value="!title">По названию (реверс)</option>
           <option value="counter">По количеству</option>
           <option value="!counter">По количеству (реверс)</option>
+          <option value="size">По размеру</option>
+          <option value="!size">По размеру (реверс)</option>
         </select>
       </f7-list-item>
       <f7-list-item :media="icon(item)" swipeout link="#" @click="clicked(item)" :key="item['.key']" v-for="item in sorted" :title="item.title"
-        :badge="formatBytes(item.totalBytes) || item['counter'] || 0" badge-color="green" :subtitle="item.url" >
+        :badge="formatBytes(item.totalBytes) || item['counter'] || 0" badge-color="green" :subtitle="item.url">
         <f7-swipeout-actions left>
           <f7-swipeout-button color="red" @click="removeItem(item)">Delete</f7-swipeout-button>
         </f7-swipeout-actions>
@@ -85,6 +87,18 @@
             var b1 = b.title
             return a1 === b1 ? 0 : (a1 > b1 ? 1 : -1)
           }).reverse()
+        } else if (this.sort === 'size') {
+          return this.items.sort(function (a, b) {
+            var a1 = a.totalBytes || 0
+            var b1 = b.totalBytes || 0
+            return a1 - b1
+          })
+        } else if (this.sort === '!size') {
+          return this.items.sort(function (a, b) {
+            var a1 = a.totalBytes || 0
+            var b1 = b.totalBytes || 0
+            return a1 - b1
+          }).reverse()
         } else {
           return this.items
         }
@@ -104,9 +118,12 @@
     methods: {
       formatBytes: formatBytes,
       icon: function (item) {
+        //FIXME: test
+        return '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACLklEQVRYR+3XSchOURgH8N+HTKWUITskkalMJTMl9iQlZaFEqS9zyBBlKLKQYaVQErFThhKhZLZASYmFhWEh6TPr+TqvXrd73Vs2FvfUWbzvM5z/+T/P/5xzWxSPwRiLr7iGN3/xzTP1xRR0wW08y3NqKUi6B2vwAZ0RfpuwFz9LgITvOmzDd3xGT+zG+mxsHoBpuIRZaeedsBgHsAW7SgBsxgYsw3F8w4yUM3LfaI7PA7AVczAhs9BCHMNE3CoAMTmBno8zGZ+7OIcdZQCCpkUYnrPIWQzA+ERvs0swdQ+PsSAnNnrgEPaVARiFh5iEm5lEsfgTtOJIxrYilWcoXmVs03EFw1L8b3NRE0a956V5PZMsmnF1UsjzZBuCO9iOaODmEXU/jRNYWaUJw6cjdmJVqulFvEiSDKpPpkSPkkJGpt9BfXR+KCfYmp2YDFAB/EcegJlYi7acuvVAf/RGd3RIs4i5kGgsEvMT3ibgH3Nyd42SRaKQ2NGcmhapbUliKJqteUR9v6RcJUptNy+NZm8ACG33qxKFpziM/Rn/6IvYzIiKeYKd1hrAf8NANGFjVLlsLqe7orncVzG14mXViGtvwkHp7I/D5zxeljRRaP0gNmb8QuuhkFMl8QPT+bAcFxp6DgW8xmg8KEnwryoYl94HfeKcqAHUDNQM1AzUDNQM/HcMxEX4ruQ27JXs2XdDbCb+e18x/o/bsBvmVnxMjkH45414it+vmCe+Hdt+ARY+2qtAVFYvAAAAAElFTkSuQmCC" ALT="Larry">'
+
         var url = item.url
         var arr = (/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n]+)/im).exec(url)
-        if (true || !arr || !arr.length || !arr[0]) {
+        if (!arr || !arr.length || !arr[0]) {
           console.error('invalid url: ' + url, arr)
           return '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACLklEQVRYR+3XSchOURgH8N+HTKWUITskkalMJTMl9iQlZaFEqS9zyBBlKLKQYaVQErFThhKhZLZASYmFhWEh6TPr+TqvXrd73Vs2FvfUWbzvM5z/+T/P/5xzWxSPwRiLr7iGN3/xzTP1xRR0wW08y3NqKUi6B2vwAZ0RfpuwFz9LgITvOmzDd3xGT+zG+mxsHoBpuIRZaeedsBgHsAW7SgBsxgYsw3F8w4yUM3LfaI7PA7AVczAhs9BCHMNE3CoAMTmBno8zGZ+7OIcdZQCCpkUYnrPIWQzA+ERvs0swdQ+PsSAnNnrgEPaVARiFh5iEm5lEsfgTtOJIxrYilWcoXmVs03EFw1L8b3NRE0a956V5PZMsmnF1UsjzZBuCO9iOaODmEXU/jRNYWaUJw6cjdmJVqulFvEiSDKpPpkSPkkJGpt9BfXR+KCfYmp2YDFAB/EcegJlYi7acuvVAf/RGd3RIs4i5kGgsEvMT3ibgH3Nyd42SRaKQ2NGcmhapbUliKJqteUR9v6RcJUptNy+NZm8ACG33qxKFpziM/Rn/6IvYzIiKeYKd1hrAf8NANGFjVLlsLqe7orncVzG14mXViGtvwkHp7I/D5zxeljRRaP0gNmb8QuuhkFMl8QPT+bAcFxp6DgW8xmg8KEnwryoYl94HfeKcqAHUDNQM1AzUDNQM/HcMxEX4ruQ27JXs2XdDbCb+e18x/o/bsBvmVnxMjkH45414it+vmCe+Hdt+ARY+2qtAVFYvAAAAAElFTkSuQmCC" ALT="Larry">'
         } else {
