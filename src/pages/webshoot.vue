@@ -56,7 +56,12 @@
     },
 
     firebase: {
-      items: firebase.database().ref('null'),
+      items: {
+        source: firebase.database().ref('null'),
+        cancelCallback: function () {
+          console.error('cancelCallback!!!')
+        }
+      },
     },
 
     computed: {
