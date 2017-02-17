@@ -43,6 +43,7 @@ Vue.use(Framework7Vue)
 
 // Init App
 window.app = new Vue({
+  name : 'Main',
   el: '#app',
   template: '<app/>',
   data: function () {
@@ -70,6 +71,7 @@ window.app = new Vue({
     /* Uncomment to enable Material theme: */
     // material: true,
     pushState: true,
+    uniqueHistory: true,
     routes: Routes,
     preroute: function (view, options) {
       console.log('preroute', app)
@@ -83,6 +85,14 @@ window.app = new Vue({
       }
     }
   },
+
+  beforeCreate: function () {
+    var vm = this
+    firebase.auth().onAuthStateChanged(function (user) {
+      console.log('USER', user)
+      vm.user = user
+    })
+  }, // 2.x
 
   // Register App Component
   components: {

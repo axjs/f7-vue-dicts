@@ -25,6 +25,7 @@
             <f7-list-button v-if="!user" title="Guest sign in" @click="signInAnonymously" close-login-screen></f7-list-button>
             <f7-list-button v-if="user" title="Sign Out" @click="signOut" close-login-screen></f7-list-button>
             <!--<f7-list-button title="toggleSignIn" @click="toggleSignIn"></f7-list-button>-->
+            <f7-list-button title="Close" close-login-screen></f7-list-button>
           </f7-list>
         </f7-page>
       </f7-pages>
@@ -41,7 +42,6 @@
 
     data: function () {
       return {
-        user: null,
         email: '',
         password: '',
         error: ''
@@ -49,11 +49,15 @@
     },
 
     computed: {
+      user: function () {
+        return this.$root.user
+      },
+
       name: function () {
         var name = 'Not login'
         if (this.user) {
           if (this.user.isAnonymous) {
-            name = 'guest ' + this.user.displayName
+            name = 'Anonymous'
           } else {
             name = this.user.displayName
           }
@@ -159,16 +163,5 @@
         }
       }
     },
-    beforeCreate: function () {
-      var vm = this
-      firebase.auth().onAuthStateChanged(function (user) {
-        console.log('USER', user, this, vm)
-        vm.user = user
-        vm.$root.user = user
-      })
-    }, // 2.x
-    beforeDestroy: function () {
-    }
-
   }
 </script>
