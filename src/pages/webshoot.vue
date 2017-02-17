@@ -1,9 +1,8 @@
 <template>
   <f7-page>
-    <f7-fab color="pink">
-      <!-- <f7-icon icon="icon-plus" @click="addItem"></f7-icon> -->
-      <f7-fab-action color="pink" @click="addItem">A</f7-fab-action>
-    </f7-fab>
+    <!--<f7-fab color="pink">
+      <f7-fab-action color="pink" @click="addItem"><f7-icon icon="icon-plus" @click="addItem"></f7-icon>A</f7-fab-action>
+    </f7-fab>-->
 
     <f7-navbar back-link="Back" :title="'WebShoot '+key" sliding></f7-navbar>
 
@@ -16,7 +15,7 @@
     </f7-list>
 
     <!--<f7-block-title co>WebShoot</f7-block-title>-->
-    <f7-list contacts id="search-list">
+    <f7-list media-list contacts id="search-list">
       <f7-list-item smart-select smart-select-back-on-select title="Сортировка">
         <select name="sort" v-model="sort">
           <option value="">Без сортировки</option>
@@ -27,13 +26,13 @@
           <option value="!counter">По количеству (реверс)</option>
         </select>
       </f7-list-item>
-      <f7-list-item swipeout link="#" @click="clicked(item)" :key="item['.key']" v-for="item in sorted" :title="item.title" :badge="item['counter'] || 0"
-        badge-color="red">
+      <f7-list-item :media="icon(item)" swipeout link="#" @click="clicked(item)" :key="item['.key']" v-for="item in sorted" :title="item.title"
+        :badge="formatBytes(item.totalBytes) || item['counter'] || 0" badge-color="green" :subtitle="item.url" >
         <f7-swipeout-actions left>
           <f7-swipeout-button color="red" @click="removeItem(item)">Delete</f7-swipeout-button>
         </f7-swipeout-actions>
         <f7-swipeout-actions right>
-          <f7-swipeout-button color="green"">{{formatBytes(item.totalBytes)}}</f7-swipeout-button>
+          <f7-swipeout-button color="green">{{item['counter'] || formatBytes(item.totalBytes)}}</f7-swipeout-button>
         </f7-swipeout-actions>
         </f7-list-item>
     </f7-list>
@@ -43,7 +42,6 @@
 <script>
   import firebase from '../fb.js'
   import { formatBytes } from '../util.js'
-  console.log('formatBytes', formatBytes)
 
   export default {
     name: 'WebShootList',
@@ -105,6 +103,16 @@
 
     methods: {
       formatBytes: formatBytes,
+      icon: function (item) {
+        var url = item.url
+        var arr = (/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n]+)/im).exec(url)
+        if (true || !arr || !arr.length || !arr[0]) {
+          console.error('invalid url: ' + url, arr)
+          return '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACLklEQVRYR+3XSchOURgH8N+HTKWUITskkalMJTMl9iQlZaFEqS9zyBBlKLKQYaVQErFThhKhZLZASYmFhWEh6TPr+TqvXrd73Vs2FvfUWbzvM5z/+T/P/5xzWxSPwRiLr7iGN3/xzTP1xRR0wW08y3NqKUi6B2vwAZ0RfpuwFz9LgITvOmzDd3xGT+zG+mxsHoBpuIRZaeedsBgHsAW7SgBsxgYsw3F8w4yUM3LfaI7PA7AVczAhs9BCHMNE3CoAMTmBno8zGZ+7OIcdZQCCpkUYnrPIWQzA+ERvs0swdQ+PsSAnNnrgEPaVARiFh5iEm5lEsfgTtOJIxrYilWcoXmVs03EFw1L8b3NRE0a956V5PZMsmnF1UsjzZBuCO9iOaODmEXU/jRNYWaUJw6cjdmJVqulFvEiSDKpPpkSPkkJGpt9BfXR+KCfYmp2YDFAB/EcegJlYi7acuvVAf/RGd3RIs4i5kGgsEvMT3ibgH3Nyd42SRaKQ2NGcmhapbUliKJqteUR9v6RcJUptNy+NZm8ACG33qxKFpziM/Rn/6IvYzIiKeYKd1hrAf8NANGFjVLlsLqe7orncVzG14mXViGtvwkHp7I/D5zxeljRRaP0gNmb8QuuhkFMl8QPT+bAcFxp6DgW8xmg8KEnwryoYl94HfeKcqAHUDNQM1AzUDNQM/HcMxEX4ruQ27JXs2XdDbCb+e18x/o/bsBvmVnxMjkH45414it+vmCe+Hdt+ARY+2qtAVFYvAAAAAElFTkSuQmCC" ALT="Larry">'
+        } else {
+          return "<img src='" + arr[0] + "/favicon.ico" + "' ALT='@'>"
+        }
+      },
       clicked: function (item) {
         var counter = item.counter || 0
         firebase.database().ref(this.key + '/' + item['.key']).child('counter').set(++counter)
