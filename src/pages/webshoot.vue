@@ -28,17 +28,40 @@
           <option value="!size">По размеру (реверс)</option>
         </select>
       </f7-list-item>
-      <f7-list-item :media="icon(item)" swipeout link="#" @click="clicked(item)" :key="item['.key']" v-for="item in sorted" :title="item.title"
-        :badge="formatBytes(item.totalBytes) || item['counter'] || 0" badge-color="green" :subtitle="item.url">
-        <f7-swipeout-actions left>
-          <f7-swipeout-button color="red" @click="removeItem(item)">Delete</f7-swipeout-button>
-        </f7-swipeout-actions>
-        <f7-swipeout-actions right>
-          <f7-swipeout-button color="green">{{item['counter'] || formatBytes(item.totalBytes)}}</f7-swipeout-button>
-        </f7-swipeout-actions>
-        </f7-list-item>
-    </f7-list>
+      <f7-list-item v-if="key !== 'ws'" swipeout link="#" @click="setKey('..')" key=".." title="..">
+      </f7-list-item>
 
+      <template v-for="item in sorted">
+        <f7-list-item v-if="item.url" :media="icon(item)" swipeout link="#" @click="clicked(item)" :key="item['.key']" :title="item.title"
+          :badge="formatBytes(item.totalBytes) || item['counter'] || 0" badge-color="green" :subtitle="item.url">
+          <f7-swipeout-actions left>
+            <f7-swipeout-button color="red" @click="removeItem(item)">Delete</f7-swipeout-button>
+          </f7-swipeout-actions>
+          <f7-swipeout-actions right>
+            <f7-swipeout-button color="green" @click="copyItem(item)">{{item['counter'] || formatBytes(item.totalBytes)}}</f7-swipeout-button>
+          </f7-swipeout-actions>
+          </f7-list-item>
+          <f7-list-item v-else :media="icon(item)" swipeout link="#" @click="setKey(item)" :key="item['.key']" :title="item['.key']">
+          </f7-list-item>
+      </template>
+    </f7-list>
+    <f7-fab-speed-dial>
+      <!-- Actions -->
+      <f7-fab-actions>
+        <f7-fab-action color="pink" @click="addKey">
+          <f7-icon icon="icon-plus" @click="addKey">A</f7-icon>
+        </f7-fab-action>
+        <f7-fab-action color="orange">B</f7-fab-action>
+        <f7-fab-action color="green">C</f7-fab-action>
+      </f7-fab-actions>
+      <!-- FAB -->
+      <f7-fab>
+        <!-- First icon to open Actions -->
+        <f7-icon icon="icon-plus"></f7-icon>
+        <!-- Second icon to close Actions -->
+        <f7-icon icon="icon-close"></f7-icon>
+      </f7-fab>
+    </f7-fab-speed-dial>
   </f7-page>
 </template>
 <script>
@@ -146,10 +169,49 @@
           win && win.focus();
         }
       },
-      addItem: function () {
-        // this.$firebaseRefs.items.push({
-        //   name: 'ax'
-        // })
+      setKey: function (item) {
+        if (item === '..') {
+          this.key = 'ws'
+        } else {
+          this.key += '/' + item['.key']
+        }
+      },
+      addKey: function () {
+        var prompt = this.$f7.prompt
+        var refs = this.$firebaseRefs.items
+        prompt('Enter name', 'Firebase', function (text) {
+          if (!text)
+            return
+          var data = {}
+          data[text] = {}
+          refs.update(data).then(function (e) {
+            console.log('SET', e)
+          }).catch(function (e) {
+            console.log('SET ERROR', e)
+          })
+        })
+
+      },
+      copyItem: function (item) {
+        var prompt = this.$f7.prompt
+        var refs = this.$firebaseRefs.items
+        prompt('Enter name', 'Firebase', function (text) {
+          if (!text)
+            return
+          var data = Object.assign({}, item)
+          if (data['.value']) {
+            data = data['.value']
+          } else {
+            delete data['.key']
+          }
+          console.log('data', data)
+
+          refs.child(text).child(item['.key']).set(data).then(function (e) {
+            console.log('SET', e)
+          }).catch(function (e) {
+            console.log('SET ERROR', e)
+          })
+        })
       },
       removeItem: function (item) {
         var alert = this.$f7.alert
